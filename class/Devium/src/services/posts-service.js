@@ -32,7 +32,7 @@ const deletePost = async (id, userId) => {
   if (!post) {
     throw new ApiError(statusCode.NOT_FOUND, "Post not found");
   }
-  if (post.userId !== userId) {
+  if (!post.userId.equals(userId)) {
     throw new ApiError(
       statusCode.FORBIDDEN,
       "You are not allowed to delete this post"
@@ -47,7 +47,7 @@ const updatePost = async (id, userId, data) => {
   if (!post) {
     throw new ApiError(statusCode.NOT_FOUND, "Post not found");
   }
-  if (post.userId !== userId) {
+  if (!post.userId.equals(userId)) {
     throw new ApiError(
       statusCode.FORBIDDEN,
       "You are not allowed to update this post"
@@ -78,20 +78,31 @@ const getAllPosts = async ({
   q,
   status = "published",
 }) => {
-  const posts = await Post.find({
+  const filters = {
     title: {
-      $text: {
-        $search: q,
-      },
+      //i means case insensitive
+
+      $regex: q || "",
+      $options: "i",
     },
     status: status,
-  })
+  };
+  const posts = await Post.find(filters)
     .sort({
       [sortBy]: -1,
     })
     .limit(perPage)
     .skip(perPage * (page - 1));
-  return posts;
+  const postsCount = await Post.countDocuments(filters);
+  return {
+    //ceil round figure
+    data: posts,
+    meta: {
+      currentPage: page,
+      prePage: perPage,
+      totalPages: Math.ceil(postsCount / perPage),
+    },
+  };
 };
 
 const reactOnPost = async (id, userId) => {

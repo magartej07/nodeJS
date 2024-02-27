@@ -24,7 +24,7 @@ router.post(
 );
 router.delete("/:id", isLoggedIn, deletePostController);
 router.patch(
-  "/:id",
+  "/:id",upload.single("thumbnail"),
   isLoggedIn,
   schemaValidator(postSchema),
   updatePostController

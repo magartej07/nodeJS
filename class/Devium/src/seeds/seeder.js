@@ -1,12 +1,14 @@
 const dotenv =require('dotenv');
 const connectToDb = require('../utils/db');
 const createAdmin = require('./user-seeder');
+const createPosts = require('./post-seeder');
 
 dotenv.config()
 
 const runSeeder = async()=>{
     await connectToDb()
-    await createAdmin()
+    // await createAdmin()
+    await createPosts()
 
 }
 

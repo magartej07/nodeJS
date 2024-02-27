@@ -29,8 +29,8 @@ const createPostController = asyncHandler(async (req, res) => {
 
 const deletePostController = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const post = await deletePost(id);
-  req.user._id;
+  const post = await deletePost(id,req.user._id);
+  
   res.status(200).json(new ApiResponse(statusCode.OK, "Post deleted", post));
 });
 
@@ -57,9 +57,14 @@ const unReactOnPostController = asyncHandler(async (req, res) => {
 });
 
 const updatePostController = asyncHandler(async (req, res) => {
+  const thumbnail = req.file;
   const { id } = req.params;
   const response = req.body;
-  const post = await updatePost(id, req.user._id, response);
+
+  const post = await updatePost(id, req.user._id, thumbnail ? {
+    ...response,
+    thumbnail: thumbnail.path,
+  }:response);
   res.status(200).json(new ApiResponse(statusCode.OK, "Post updated", post));
 });
 
@@ -72,14 +77,14 @@ const getAllPostController = asyncHandler(async (req, res) => {
     q,
   } = req.query;
 
-  const posts = await getAllPosts({
+  const { data, meta } = await getAllPosts({
     page,
     perPage,
     sortBy,
     status,
     q,
   });
-  res.status(200).json(new ApiResponse(statusCode.OK, "All Post", posts));
+  res.status(200).json(new ApiResponse(statusCode.OK, "All Post", data, meta));
 });
 
 module.exports = {
