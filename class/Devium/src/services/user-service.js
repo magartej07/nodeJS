@@ -8,7 +8,7 @@ const fs = require("fs")
 const hbs = require("handlebars")
 
 const createUser = async (userData) => {
-  console.log(userData);
+  // console.log(userData);
   try {
     const hashedPassword = await hashPassword(userData.password);
     // const verificationToken = generateToken();
